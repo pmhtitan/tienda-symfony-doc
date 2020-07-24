@@ -31,6 +31,12 @@ class RegistrationController extends AbstractController
                     $form->get('plainPassword')->getData()
                 )
             );
+            //  Manejamos aqui el resto de campos register
+            $date = new \DateTime('now');
+            $user->setRoles(['roles' => 'ROLE_USER']);
+            $user->setCreatedAt($date);
+            $user->setUpdatedAt($date);
+            //  Listo! ya puede registrar sin problemas
 
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($user);
