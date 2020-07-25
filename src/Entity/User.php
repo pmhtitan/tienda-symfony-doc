@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -55,6 +57,22 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $remember_token;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Pedido::class, mappedBy="usuario_id")
+     */
+    private $pedido;
+
+    /**
+     * @ORM\OneToMany(targetEntity=DatosFacturacion::class, mappedBy="usuario_id")
+     */
+    private $datosFacturacion;
+
+    public function __construct()
+    {
+        $this->pedido = new ArrayCollection();
+        $this->datosFacturacion = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -178,6 +196,68 @@ class User implements UserInterface
     public function setRememberToken(?string $remember_token): self
     {
         $this->remember_token = $remember_token;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Pedido[]
+     */
+    public function getPedido(): Collection
+    {
+        return $this->pedido;
+    }
+
+    public function addPedido(Pedido $pedido): self
+    {
+        if (!$this->pedido->contains($pedido)) {
+            $this->pedido[] = $pedido;
+            $pedido->setUsuarioId($this);
+        }
+
+        return $this;
+    }
+
+    public function removePedido(Pedido $pedido): self
+    {
+        if ($this->pedido->contains($pedido)) {
+            $this->pedido->removeElement($pedido);
+            // set the owning side to null (unless already changed)
+            if ($pedido->getUsuarioId() === $this) {
+                $pedido->setUsuarioId(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|DatosFacturacion[]
+     */
+    public function getDatosFacturacion(): Collection
+    {
+        return $this->datosFacturacion;
+    }
+
+    public function addDatosFacturacion(DatosFacturacion $datosFacturacion): self
+    {
+        if (!$this->datosFacturacion->contains($datosFacturacion)) {
+            $this->datosFacturacion[] = $datosFacturacion;
+            $datosFacturacion->setUsuarioId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDatosFacturacion(DatosFacturacion $datosFacturacion): self
+    {
+        if ($this->datosFacturacion->contains($datosFacturacion)) {
+            $this->datosFacturacion->removeElement($datosFacturacion);
+            // set the owning side to null (unless already changed)
+            if ($datosFacturacion->getUsuarioId() === $this) {
+                $datosFacturacion->setUsuarioId(null);
+            }
+        }
 
         return $this;
     }
