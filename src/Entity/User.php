@@ -58,16 +58,7 @@ class User implements UserInterface
      */
     private $remember_token;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Pedido::class, mappedBy="usuario_id")
-     */
-    private $pedido;
-
-    /**
-     * @ORM\OneToMany(targetEntity=DatosFacturacion::class, mappedBy="usuario_id")
-     */
-    private $datosFacturacion;
-
+    
     public function __construct()
     {
         $this->pedido = new ArrayCollection();
@@ -200,65 +191,5 @@ class User implements UserInterface
         return $this;
     }
 
-    /**
-     * @return Collection|Pedido[]
-     */
-    public function getPedido(): Collection
-    {
-        return $this->pedido;
-    }
-
-    public function addPedido(Pedido $pedido): self
-    {
-        if (!$this->pedido->contains($pedido)) {
-            $this->pedido[] = $pedido;
-            $pedido->setUsuarioId($this);
-        }
-
-        return $this;
-    }
-
-    public function removePedido(Pedido $pedido): self
-    {
-        if ($this->pedido->contains($pedido)) {
-            $this->pedido->removeElement($pedido);
-            // set the owning side to null (unless already changed)
-            if ($pedido->getUsuarioId() === $this) {
-                $pedido->setUsuarioId(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|DatosFacturacion[]
-     */
-    public function getDatosFacturacion(): Collection
-    {
-        return $this->datosFacturacion;
-    }
-
-    public function addDatosFacturacion(DatosFacturacion $datosFacturacion): self
-    {
-        if (!$this->datosFacturacion->contains($datosFacturacion)) {
-            $this->datosFacturacion[] = $datosFacturacion;
-            $datosFacturacion->setUsuarioId($this);
-        }
-
-        return $this;
-    }
-
-    public function removeDatosFacturacion(DatosFacturacion $datosFacturacion): self
-    {
-        if ($this->datosFacturacion->contains($datosFacturacion)) {
-            $this->datosFacturacion->removeElement($datosFacturacion);
-            // set the owning side to null (unless already changed)
-            if ($datosFacturacion->getUsuarioId() === $this) {
-                $datosFacturacion->setUsuarioId(null);
-            }
-        }
-
-        return $this;
-    }
+   
 }

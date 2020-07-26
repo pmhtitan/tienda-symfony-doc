@@ -18,9 +18,9 @@ class Producto
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Categoria::class, inversedBy="producto")
+     * @ORM\ManyToOne(targetEntity=Categoria::class, inversedBy="productos")
      */
-    private $categoria_id;
+    private $categoria;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -62,14 +62,14 @@ class Producto
         return $this->id;
     }
 
-    public function getCategoriaId(): ?Categoria
+    public function getCategoria(): ?Categoria
     {
-        return $this->categoria_id;
+        return $this->categoria;
     }
 
-    public function setCategoriaId(?Categoria $categoria_id): self
+    public function setCategoria(?Categoria $categoria): self
     {
-        $this->categoria_id = $categoria_id;
+        $this->categoria = $categoria;
 
         return $this;
     }

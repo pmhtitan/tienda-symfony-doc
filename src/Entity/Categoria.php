@@ -35,13 +35,13 @@ class Categoria
     private $updated_at;
 
     /**
-     * @ORM\OneToMany(targetEntity=Producto::class, mappedBy="categoria_id")
+     * @ORM\OneToMany(targetEntity=Producto::class, mappedBy="categoria")
      */
-    private $producto;
+    private $productos;
 
     public function __construct()
     {
-        $this->producto = new ArrayCollection();
+        $this->productos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -88,16 +88,16 @@ class Categoria
     /**
      * @return Collection|Producto[]
      */
-    public function getProducto(): Collection
+    public function getProductos(): Collection
     {
-        return $this->producto;
+        return $this->productos;
     }
 
     public function addProducto(Producto $producto): self
     {
-        if (!$this->producto->contains($producto)) {
-            $this->producto[] = $producto;
-            $producto->setCategoriaId($this);
+        if (!$this->productos->contains($producto)) {
+            $this->productos[] = $producto;
+            $producto->setCategoria($this);
         }
 
         return $this;
@@ -105,14 +105,15 @@ class Categoria
 
     public function removeProducto(Producto $producto): self
     {
-        if ($this->producto->contains($producto)) {
-            $this->producto->removeElement($producto);
+        if ($this->productos->contains($producto)) {
+            $this->productos->removeElement($producto);
             // set the owning side to null (unless already changed)
-            if ($producto->getCategoriaId() === $this) {
-                $producto->setCategoriaId(null);
+            if ($producto->getCategoria() === $this) {
+                $producto->setCategoria(null);
             }
         }
 
         return $this;
     }
+    
 }
