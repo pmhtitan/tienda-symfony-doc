@@ -58,11 +58,29 @@ class User implements UserInterface
      */
     private $remember_token;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Pedido::class, mappedBy="usuario")
+     */
+    private $pedidos;
+
+    /**
+     * @ORM\OneToMany(targetEntity=DatosFacturacion::class, mappedBy="usuario")
+     */
+    private $datosFacturacions;
+
+    /**
+     * @ORM\OneToMany(targetEntity=LineasPedidos::class, mappedBy="pedido")
+     */
+    private $lineasPedidos;
+
     
     public function __construct()
     {
         $this->pedido = new ArrayCollection();
         $this->datosFacturacion = new ArrayCollection();
+        $this->pedidos = new ArrayCollection();
+        $this->datosFacturacions = new ArrayCollection();
+        $this->lineasPedidos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -187,6 +205,99 @@ class User implements UserInterface
     public function setRememberToken(?string $remember_token): self
     {
         $this->remember_token = $remember_token;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Pedido[]
+     */
+    public function getPedidos(): Collection
+    {
+        return $this->pedidos;
+    }
+
+    public function addPedido(Pedido $pedido): self
+    {
+        if (!$this->pedidos->contains($pedido)) {
+            $this->pedidos[] = $pedido;
+            $pedido->setUsuario($this);
+        }
+
+        return $this;
+    }
+
+    public function removePedido(Pedido $pedido): self
+    {
+        if ($this->pedidos->contains($pedido)) {
+            $this->pedidos->removeElement($pedido);
+            // set the owning side to null (unless already changed)
+            if ($pedido->getUsuario() === $this) {
+                $pedido->setUsuario(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|DatosFacturacion[]
+     */
+    public function getDatosFacturacions(): Collection
+    {
+        return $this->datosFacturacions;
+    }
+
+    public function addDatosFacturacion(DatosFacturacion $datosFacturacion): self
+    {
+        if (!$this->datosFacturacions->contains($datosFacturacion)) {
+            $this->datosFacturacions[] = $datosFacturacion;
+            $datosFacturacion->setUsuario($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDatosFacturacion(DatosFacturacion $datosFacturacion): self
+    {
+        if ($this->datosFacturacions->contains($datosFacturacion)) {
+            $this->datosFacturacions->removeElement($datosFacturacion);
+            // set the owning side to null (unless already changed)
+            if ($datosFacturacion->getUsuario() === $this) {
+                $datosFacturacion->setUsuario(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|LineasPedidos[]
+     */
+    public function getLineasPedidos(): Collection
+    {
+        return $this->lineasPedidos;
+    }
+
+    public function addLineasPedido(LineasPedidos $lineasPedido): self
+    {
+        if (!$this->lineasPedidos->contains($lineasPedido)) {
+            $this->lineasPedidos[] = $lineasPedido;
+            $lineasPedido->setPedido($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLineasPedido(LineasPedidos $lineasPedido): self
+    {
+        if ($this->lineasPedidos->contains($lineasPedido)) {
+            $this->lineasPedidos->removeElement($lineasPedido);
+            // set the owning side to null (unless already changed)
+            if ($lineasPedido->getPedido() === $this) {
+                $lineasPedido->setPedido(null);
+            }
+        }
 
         return $this;
     }

@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ProductoRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -56,6 +58,16 @@ class Producto
      * @ORM\Column(type="datetime")
      */
     private $updated_at;
+
+    /**
+     * @ORM\OneToMany(targetEntity=LineasPedidos::class, mappedBy="producto")
+     */
+    private $lineasPedidos;
+
+    public function __construct()
+    {
+        $this->lineasPedidos = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -154,6 +166,37 @@ class Producto
     public function setUpdatedAt(\DateTimeInterface $updated_at): self
     {
         $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|LineasPedidos[]
+     */
+    public function getLineasPedidos(): Collection
+    {
+        return $this->lineasPedidos;
+    }
+
+    public function addLineasPedido(LineasPedidos $lineasPedido): self
+    {
+        if (!$this->lineasPedidos->contains($lineasPedido)) {
+            $this->lineasPedidos[] = $lineasPedido;
+            $lineasPedido->setProducto($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLineasPedido(LineasPedidos $lineasPedido): self
+    {
+        if ($this->lineasPedidos->contains($lineasPedido)) {
+            $this->lineasPedidos->removeElement($lineasPedido);
+            // set the owning side to null (unless already changed)
+            if ($lineasPedido->getProducto() === $this) {
+                $lineasPedido->setProducto(null);
+            }
+        }
 
         return $this;
     }
