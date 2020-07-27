@@ -6,3 +6,15 @@ landing:
     path: /landing
     controller: App\Controller\AuthController::landingAuth
 
+crearProducto:
+    path: /crear-producto
+    controller: App\Controller\ProductoController::crearProducto
+
+crearCategoria:
+    path: /crear-categoria
+    controller: App\Controller\CategoriaController::crearCategoria
+
+mostrarProducto: 
+    path: /mostrar-producto
+    controller: App\Controller\ProductoController::mostrarProducto
+

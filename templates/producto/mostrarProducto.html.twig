@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Crear Producto{% endblock %}
+
+{% block body %}
+
+    <div class="container">
+        <div class="col-md-8">
+            {% for prod in producto %} 
+           <img src="{{ asset('uploads/imagenesProd/' ~ prod.imagen) }}"> 
+            {% endfor %}
+        </div>
+    </div>
+
+    
+
+
+{% endblock %}
