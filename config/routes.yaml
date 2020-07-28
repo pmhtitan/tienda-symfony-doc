@@ -2,6 +2,10 @@
 #    path: /
 #    controller: App\Controller\DefaultController::index
 
+productos:
+    path: /productos
+    controller: App\Controller\ProductoController::index
+
 landing:
     path: /landing
     controller: App\Controller\AuthController::landingAuth
@@ -14,7 +18,11 @@ crearCategoria:
     path: /crear-categoria
     controller: App\Controller\CategoriaController::crearCategoria
 
-mostrarProducto: 
-    path: /mostrar-producto
+mostrarProductos: 
+    path: /mostrar-productos
+    controller: App\Controller\ProductoController::mostrarProductos
+
+mostrarProducto:
+    path: /producto/{id}
     controller: App\Controller\ProductoController::mostrarProducto
 

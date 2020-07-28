@@ -12,13 +12,16 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class ProductoController extends AbstractController
 {
-    /**
-     * @Route("/producto", name="producto")
-     */
+
     public function index()
     {
+
+        //  Cargamos 9 productos(max) en cards en la home de productos.
+
+        $productos_repo = $this->getDoctrine()->getRepository(Producto::class)->findBy([], ['id' => 'DESC'],9);
+
         return $this->render('producto/index.html.twig', [
-            'controller_name' => 'ProductoController',
+           'productos' => $productos_repo,
         ]);
     }
 
@@ -80,12 +83,43 @@ class ProductoController extends AbstractController
         ]);
     }
 
-    public function mostrarProducto(){
+    public function mostrarProductos(){
 
         $producto_repo = $this->getDoctrine()->getRepository(Producto::class)->findAll();
 
+        return $this->render('producto/mostrarProductos.html.twig', [
+            'productos' => $producto_repo
+        ]);
+    }
+
+    public function mostrarProducto($id){
+
+        //  2 Productos random por DQL SYMFONY, 2 times
+            // Con SQL de toda la vida
+            $connection = $this->getDoctrine()->getConnection();
+            $sql1 = "SELECT * FROM producto ORDER BY RAND() LIMIT 2";
+            $sql2 = "SELECT * FROM producto ORDER BY RAND() LIMIT 2";
+            $stmt1 = $connection->prepare($sql1);
+            $stmt2 = $connection->prepare($sql2);
+            $stmt1->execute();
+            $stmt2->execute();
+            $querySQL1 = $stmt1->fetchAll();
+            $querySQL2 = $stmt2->fetchAll();
+          
+
+        $producto_repo = $this->getDoctrine()->getRepository(Producto::class)->find($id);
+
+        if(!$producto_repo){
+            $message = "El producto no existe o no se encuentra disponible.";
+        }else{
+            $message = null;
+        }
+
         return $this->render('producto/mostrarProducto.html.twig', [
-            'producto' => $producto_repo
+            'message' => $message,
+            'producto' => $producto_repo,
+            'paqueteRandom1' => $querySQL1,
+            'paqueteRandom2' => $querySQL2,
         ]);
     }
 }
