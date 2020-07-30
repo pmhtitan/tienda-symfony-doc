@@ -42,6 +42,18 @@ categoria_eliminar:
     path: /categoria-eliminar/{id}
     controller: App\Controller\CategoriaController::delete
 
+gestionProductos:
+    path: /gestion-productos
+    controller: App\Controller\ProductoController::gestionProductos
+
+producto_editar:
+    path: /producto-editar/{id}
+    controller: App\Controller\ProductoController::update
+
+producto_eliminar:
+    path: /producto-eliminar/{id}
+    controller: App\Controller\ProductoController::delete
+
 
 
 

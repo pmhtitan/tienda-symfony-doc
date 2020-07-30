@@ -4,6 +4,21 @@
     }
 }
 
+@media only screen and (min-width: 800px){
+    /* .boton-gestionProd{
+        
+    } */
+    .td-caja-gestionProd{
+        display: inline-flex!important;
+    }
+}
+
+@media only screen and (max-width: 800px){
+    .button-nospacing-mobileProd{
+        margin-top:10%!important;
+    }
+}
+
 .example-wrapper {
     margin: 1em auto;
     max-width: 800px;

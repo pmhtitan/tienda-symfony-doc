@@ -44,13 +44,14 @@
                                         <a href="#">Gestión<i class="fas fa-caret-down"></i></a>
                                          <div class="dropdown">
                                             <ul>
+                                            {% if is_granted('ROLE_ADMIN') %}
                                                 <li class="dropdown-link">
-                                                    <a href="#">Link 1</a>
+                                                    <a href="{{ path('gestionCategorias') }}">Categorias</a>
                                                 </li>
                                                 <li class="dropdown-link">
-                                                    <a href="#">Link 2</a>
+                                                    <a href="{{ path('gestionProductos') }}">Productos</a>
                                                 </li>
-                                                {% if is_granted('ROLE_ADMIN') %}
+                                                
                                                 <li class="dropdown-link">
                                                     <a href="#">Crear<i class="fas fa-caret-down"></i></a>
                                                     <div class="dropdown second">
@@ -65,7 +66,7 @@
                                                         </ul>
                                                     </div>
                                                 </li>
-                                                {% elseif is_granted('ROLE_USER') %}
+                                            {% elseif is_granted('ROLE_USER') %}
                                                 <li class="dropdown-link">
                                                     <a href="#">Mi cuenta<i class="fas fa-caret-down"></i></a>
                                                     <div class="dropdown second">
@@ -150,7 +151,7 @@
                                  <a href="{{ path('app_logout')}}" class="btnNavbar transparent">Logout</a>
                             {% else %}
                                 <a href="{{ path('app_login') }}" class="btnNavbar transparent">Log in</a>
-                                <a href="{{ path('app_logout') }}" class="btnNavbar solid">Sign up</a>
+                                <a href="{{ path('app_register') }}" class="btnNavbar solid">Sign up</a>
                             {% endif %}
                             </div>
                         </div>

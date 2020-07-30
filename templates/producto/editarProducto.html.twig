@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Editar Producto{% endblock %}
+
+{% block body %}
+
+    <div class="container">
+        <div class="col-md-8">
+            {% for flash_message in app.session.flashbag.get('notice') %}
+                <div class="alert alert-success">
+                {{ flash_message }}
+                </div>
+            {% endfor %}
+            <h1>Bienvenido a la landing Page de Editar Producto</h1>
+
+            <p>Si estás viendo esto, es que funciona.</p>
+
+            {{ form_start(formProducto) }}
+            {{ form_widget(formProducto) }}
+            {{ form_end(formProducto) }}
+        </div>
+    </div>
+
+{% endblock %}

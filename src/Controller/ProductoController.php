@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Producto;
 use App\Form\CrearProductoType;
+use App\Form\EditarProductoType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
@@ -121,5 +122,86 @@ class ProductoController extends AbstractController
             'paqueteRandom1' => $querySQL1,
             'paqueteRandom2' => $querySQL2,
         ]);
+    }
+
+    public function gestionProductos(){
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $productos_repo = $entityManager->getRepository(Producto::class)->findAll();
+
+        return $this->render('producto/gestionProductos.html.twig', [
+            'productos' => $productos_repo,
+        ]);
+    }
+
+    public function update(Request $request, $id, SluggerInterface $slugger){
+        
+        $entityManager = $this->getDoctrine()->getManager();
+        $producto_repo = $entityManager->getRepository(Producto::class)->find($id);
+
+        $form = $this->createForm(EditarProductoType::class, $producto_repo);
+        $form->handleRequest($request);
+
+        if($form->isSubmitted() && $form->isValid()){
+
+             //  File Upload management **
+
+             /** @var UploadedFile $imagenFile */
+             $imagenFile = $form->get('imagen')->getData();
+
+             // this condition is needed because the 'brochure' field is not required
+             // so the PDF file must be processed only when a file is uploaded
+             if ($imagenFile) {
+                 $originalFilename = pathinfo($imagenFile->getClientOriginalName(), PATHINFO_FILENAME);
+                 // this is needed to safely include the file name as part of the URL
+                 $safeFilename = $slugger->slug($originalFilename);
+                 $newFilename = $safeFilename.'-'.uniqid().'.'.$imagenFile->guessExtension();
+ 
+                 // Move the file to the directory where brochures are stored
+                 try {
+                     $imagenFile->move(
+                         $this->getParameter('imagenesProd_directory'),
+                         $newFilename
+                     );
+                 } catch (FileException $e) {
+                     // ... handle exception if something happens during file upload
+                 }
+ 
+                 // updates the 'imagenFilename' property to store the IMAGE file name
+                 // instead of its contents
+                 $producto_repo->setImagen($newFilename);
+            }
+
+            $date = new \Datetime('now');
+            $producto_repo->setUpdatedAt($date);
+            
+            $entityManager->persist($producto_repo);
+            $entityManager->flush();
+
+            $this->addFlash(
+                'notice', 'Se ha actualizado el producto'
+            );
+
+            return $this->redirectToRoute('gestionProductos');
+
+            
+        }
+        return $this->render('producto/editarProducto.html.twig', [
+            'formProducto' => $form->createView(),
+        ]);
+    }
+
+    public function delete($id){
+        $entityManager = $this->getDoctrine()->getManager();
+        $producto_repo = $entityManager->getRepository(Producto::class)->find($id);
+
+        $entityManager->remove($producto_repo);
+        $entityManager->flush();
+
+        $this->addFlash(
+            'notice', 'Se ha eliminado el producto correctamente'
+        );
+
+        return $this->redirectToRoute('gestionProductos');
     }
 }

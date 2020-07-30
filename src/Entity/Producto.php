@@ -21,6 +21,7 @@ class Producto
 
     /**
      * @ORM\ManyToOne(targetEntity=Categoria::class, inversedBy="productos")
+     * @ORM\JoinColumn(nullable=false)
      */
     private $categoria;
 

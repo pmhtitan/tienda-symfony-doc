@@ -35,7 +35,7 @@ class Categoria
     private $updated_at;
 
     /**
-     * @ORM\OneToMany(targetEntity=Producto::class, mappedBy="categoria")
+     * @ORM\OneToMany(targetEntity=Producto::class, mappedBy="categoria", orphanRemoval=true)
      */
     private $productos;
 

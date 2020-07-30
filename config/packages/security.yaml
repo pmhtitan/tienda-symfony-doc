@@ -39,4 +39,9 @@ security:
          - { path: ^/crear-categoria, roles: ROLE_ADMIN }
          - { path: ^/mis-datos, roles: ROLE_USER }
          - { path: ^/gestion-categorias, roles: ROLE_ADMIN }
+         - { path: ^/categoria-editar, roles: ROLE_ADMIN }
+         - { path: ^/categoria-eliminar, roles: ROLE_ADMIN }
+         - { path: ^/gestion-productos, roles: ROLE_ADMIN }
+         - { path: ^/producto-editar, roles: ROLE_ADMIN }
+         - { path: ^/producto-eliminar, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }

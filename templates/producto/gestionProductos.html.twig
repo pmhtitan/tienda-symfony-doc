@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion Productos{% endblock %}
+
+{% block body %}
+
+    <div class="container">
+        
+            {% for flash_message in app.session.flashbag.get('notice') %}
+                <div class="alert alert-success">
+                {{ flash_message }}
+                </div>
+            {% endfor %}
+            <h1>Bienvenido a la landing Page de Gestion Productos</h1>
+
+            <p>Si estás viendo esto, es que funciona.</p>
+
+           <div class="container">
+                <h2>GESTIÓN PRODUCTOS</h2>
+                <p>Aquí puedes ver, editar y  eliminar los productos existentes</p> 
+                <div class="table-responsive">            
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>Nombre</th>
+                        <th>Descripcion</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Categoria</th>
+                        <th>Imagen</th>
+                        <th>Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for prod in productos %}
+                    <tr>
+                        <td>{{ prod.id }}</td>
+                        <td>{{ prod.nombre }}</td>
+                        <td>{{ prod.descripcion }}</td>
+                        <td>{{ prod.precio }} €</td>
+                        <td>{{ prod.stock }}</td>
+                        <td>{{ prod.categoria.nombre }}</td>
+                        <td><img src="{{ asset('uploads/imagenesProd/' ~ prod.imagen) }}" width='50' height='50'/></td>
+                        <td class="td-caja-gestionProd">    
+                            <a href="{{ path('producto_editar', {'id' : prod.id}) }}" class="btn btn-success fa fa-edit boton-gestionProd" title="Editar" alt="Editar"></a>
+                            <a href="{{ path('producto_eliminar', {'id' : prod.id}) }}"  onclick="return confirm('¿Estás seguro? Vas a borrar un producto')" class="btn btn-danger boton-gestionProd button-nospacing-mobileProd fa fa-trash ml-1" title="Borrar" alt="Borrar"></a>
+                        </td>
+                    </tr>                      
+                    {% endfor %}
+                      
+
+
+                    </tbody>
+                </table>
+                </div> 
+            </div>
+        
+    </div>
+
+{% endblock %}
