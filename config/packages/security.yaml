@@ -37,4 +37,6 @@ security:
     access_control:
          - { path: ^/crear-producto, roles: ROLE_ADMIN }
          - { path: ^/crear-categoria, roles: ROLE_ADMIN }
+         - { path: ^/mis-datos, roles: ROLE_USER }
+         - { path: ^/gestion-categorias, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }

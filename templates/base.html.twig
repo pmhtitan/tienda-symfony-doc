@@ -50,20 +50,37 @@
                                                 <li class="dropdown-link">
                                                     <a href="#">Link 2</a>
                                                 </li>
+                                                {% if is_granted('ROLE_ADMIN') %}
                                                 <li class="dropdown-link">
-                                                    <a href="#">Tareas<i class="fas fa-caret-down"></i></a>
+                                                    <a href="#">Crear<i class="fas fa-caret-down"></i></a>
                                                     <div class="dropdown second">
                                                         <ul>
                                                             <li class="dropdown-link">
-                                                                <a href="#">Mis Tareas</a>
+                                                                <a href="{{ path('crearCategoria') }}">Crear Categoria</a>
                                                             </li>
                                                             <li class="dropdown-link">
-                                                                <a href="#">Crear Tarea</a>
+                                                                <a href="{{ path('crearProducto') }}">Crear Producto</a>
                                                             </li>
                                                             <div class="arrow"></div>
                                                         </ul>
                                                     </div>
                                                 </li>
+                                                {% elseif is_granted('ROLE_USER') %}
+                                                <li class="dropdown-link">
+                                                    <a href="#">Mi cuenta<i class="fas fa-caret-down"></i></a>
+                                                    <div class="dropdown second">
+                                                        <ul>
+                                                            <li class="dropdown-link">
+                                                                <a href="{{ path('datosFacturacion') }}">Mis datos</a>
+                                                            </li>
+                                                            {# <li class="dropdown-link">
+                                                                <a href="{{ path('crearProducto') }}">Crear Producto</a>
+                                                            </li> #}
+                                                            <div class="arrow"></div>
+                                                        </ul>
+                                                    </div>
+                                                </li>
+                                                {% endif %}
                                                 <div class="arrow"></div>
                                             </ul>
                                         </div> 
@@ -129,11 +146,11 @@
 
                             <div class="log-sign" style="--i: 1.8s">
                             {% if app.user %}
-                                <div class="userLoggedName">Hola, {{ app.user.name }}</div>
-                                 <a href="#" class="btnNavbar transparent">Logout</a>
+                                <div class="userLoggedName">Hola, {{ app.user.email }}</div>
+                                 <a href="{{ path('app_logout')}}" class="btnNavbar transparent">Logout</a>
                             {% else %}
-                                <a href="#" class="btnNavbar transparent">Log in</a>
-                                <a href="#" class="btnNavbar solid">Sign up</a>
+                                <a href="{{ path('app_login') }}" class="btnNavbar transparent">Log in</a>
+                                <a href="{{ path('app_logout') }}" class="btnNavbar solid">Sign up</a>
                             {% endif %}
                             </div>
                         </div>

@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Crear Categoria{% endblock %}
+
+{% block body %}
+
+    <div class="container">
+        <div class="col-md-8">
+            {% for flash_message in app.session.flashbag.get('notice') %}
+                <div class="alert alert-success">
+                {{ flash_message }}
+                </div>
+            {% endfor %}
+            <h1>Bienvenido a la landing Page de Mostrar Categorias</h1>
+
+            <p>Si estás viendo esto, es que funciona.</p>
+
+           <div class="container">
+                <h2>GESTIÓN CATEGORIAS</h2>
+                <p>Aquí puedes ver, editar y  eliminar las categorias existentes</p>            
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>Nombre</th>
+                        <th>Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for cat in categorias %}
+                    <tr>
+                        <td>{{ cat.id }}</td>
+                        <td>{{ cat.nombre }}</td>
+                        <td>    
+                            <a href="{{ path('categoria_editar', {'id' : cat.id}) }}" class="btn btn-success fa fa-edit" title="Editar" alt="Editar"></a>
+                            <a href="{{ path('categoria_eliminar', {'id' : cat.id}) }}"  onclick="return confirm('¿Estás seguro? Vas a borrar una categoria')" class="btn btn-danger button-nospacing-mobile fa fa-trash ml-1" title="Borrar" alt="Borrar"></a>
+                        </td>
+                    </tr>                      
+                    {% endfor %}
+                      
+
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

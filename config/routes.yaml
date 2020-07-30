@@ -26,3 +26,22 @@ mostrarProducto:
     path: /producto/{id}
     controller: App\Controller\ProductoController::mostrarProducto
 
+datosFacturacion:
+    path: /mis-datos
+    controller: App\Controller\DatosFacturacionController::gestionDatos
+
+gestionCategorias:
+    path: /gestion-categorias
+    controller: App\Controller\CategoriaController::gestionCategorias
+
+categoria_editar:
+    path: /categoria-editar/{id}
+    controller: App\Controller\CategoriaController::update
+
+categoria_eliminar:
+    path: /categoria-eliminar/{id}
+    controller: App\Controller\CategoriaController::delete
+
+
+
+

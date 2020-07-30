@@ -1,3 +1,9 @@
+@media only screen and (max-width: 340px){
+    .button-nospacing-mobile{
+        margin-top:10%!important;
+    }
+}
+
 .example-wrapper {
     margin: 1em auto;
     max-width: 800px;
