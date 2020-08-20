@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Datos de envío{% endblock %}
+
+{% block body %}
+
+<div class="container p-3 mt-5">
+    <div class="col-md-8">
+    
+        {% for flash_message in app.session.flashbag.get('notice') %}
+            <div class="alert alert-success">
+                {{ flash_message }}
+            </div>
+        {% endfor %}
+        <h3>Productos a comprar</h3>
+
+        {% set carrito = app.session.get('carrito') %}
+
+        {% if carrito is defined %}
+            {% if carrito|length >= 1 %}
+
+            <div class="infoCompra p-3 mt-4 mb-5 col-md-8 col-xl-6">
+                <div class="mb-2">
+                    <b class="">Producto</b>
+                    <b class="float-right">Precio</b>
+                </div>
+                {% for indice,elemento in carrito %}
+                    {% set producto = elemento['producto'] %}
+                        
+                        <span class="float-left span-infoCompra-box"> {{ producto.nombre }}</span>
+                        <span class="float-right">{{ producto.precio }} €</span>
+                        {% if elemento['unidades'] > 1 %}
+                        <span class="float-left ml-1">( {{ elemento['unidades'] }} )</span>
+                        {% endif %}
+                        <br>
+                {% endfor %}
+                <div class="clearfix"></div>
+                <hr>
+                
+                <div class="mt-2">
+                    <span class="">Subtotal</span>
+                    <span class="float-right">{{ stats.subtotal }} €</span>
+                </div>
+                
+                <div class="mt-2">
+                    <span class="">Shipping Cost</span>
+                    <span class="float-right">{{ stats.shippingPrice }} €</span>
+                </div>
+            
+                <div class="mt-4">
+                    <span class="">Total</span>
+                    <b class="float-right">{{ stats.total }} €</b>
+                </div>
+            </div>
+                <h3>Datos de Facturación</h3>
+                {{ form(formDatosFactu_sesion) }}
+
+            {% else %}
+            <h6>Ocurrió un error en la pasarela, ¿tienes productos en tu cesta? Prueba a añadir alguno</h6>
+
+            <a href="{{ path('productos') }}" class="btn btn-info">Volver a productos</a>
+            {% endif %}
+        {% endif %}
+    </div>    
+</div>
+{% endblock %}
+   

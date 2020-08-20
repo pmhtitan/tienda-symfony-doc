@@ -36,6 +36,7 @@ class RegistrationController extends AbstractController
             $user->setRoles(['roles' => 'ROLE_USER']);
             $user->setCreatedAt($date);
             $user->setUpdatedAt($date);
+            $user->setSessionUser(FALSE);
             //  Listo! ya puede registrar sin problemas
 
             $entityManager = $this->getDoctrine()->getManager();

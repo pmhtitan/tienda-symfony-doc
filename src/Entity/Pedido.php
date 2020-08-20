@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\PedidoRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -41,6 +43,11 @@ class Pedido
      * @ORM\Column(type="datetime")
      */
     private $updated_at;
+
+    /*
+     * @ORM\OneToMany(targetEntity=LineasPedidos::class, mappedBy="pedido")
+     */
+     private $lineasPedidos;
 
     public function getId(): ?int
     {
@@ -103,6 +110,37 @@ class Pedido
     public function setUpdatedAt(\DateTimeInterface $updated_at): self
     {
         $this->updated_at = $updated_at;
+
+        return $this;
+    }
+    
+     /**
+     * @return Collection|LineasPedidos[]
+     */
+    public function getLineasPedidos(): Collection
+    {
+        return $this->lineasPedidos;
+    }
+
+    public function addLineasPedido(LineasPedidos $lineasPedido): self
+    {
+        if (!$this->lineasPedidos->contains($lineasPedido)) {
+            $this->lineasPedidos[] = $lineasPedido;
+            $lineasPedido->setPedido($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLineasPedido(LineasPedidos $lineasPedido): self
+    {
+        if ($this->lineasPedidos->contains($lineasPedido)) {
+            $this->lineasPedidos->removeElement($lineasPedido);
+            // set the owning side to null (unless already changed)
+            if ($lineasPedido->getPedido() === $this) {
+                $lineasPedido->setPedido(null);
+            }
+        }
 
         return $this;
     }

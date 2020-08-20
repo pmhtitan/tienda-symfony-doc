@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello ProductoController!{% endblock %}
+{% block title %}Productos{% endblock %}
 
 {% block body %}
 
@@ -15,12 +15,20 @@
                     <div class="card-body">
                         <h5 class="card-title">{{ producto.nombre }}</h5>
                         <p class="card-text">{{ producto.descripcion }}</p>
-                        <a href="#" class="btn btn-primary">Añadir a la cesta</a>
+                        <a href="{{ path('carrito_add', {'id':producto.id}) }}" class="btn btn-primary btnAjax">Añadir a la cesta</a>
                     </div>
-                </div>           
+                </div>   
 
     {% endfor %}
 
          </div>
+
+        <div id="path-ajax" data-path="{{path('ajax_request')}}"></div>
+        <input type="number" value="1" id="quantity_input" style="display:none;"/>
     </div>
 {% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('resources/js/main.js') }}"></script>
+{% endblock %}
+

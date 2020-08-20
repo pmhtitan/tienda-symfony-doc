@@ -86,14 +86,15 @@
                         </div>
                         <div class="row">
                             <div class="col-xs-6" style="margin-left: 13px;">
-                                <div class="product_quantity"> <span>Cantidad: </span> <input id="quantity_input" type="text" pattern="[0-9]*" value="1">
+                                <div class="product_quantity"> <span>Cantidad: </span> <input type="number" id="quantity_input" pattern="[0-9]*" value="1">
                                     {# <div class="quantity_buttons">
                                         <div id="quantity_inc_button" class="quantity_inc quantity_control"><i class="fas fa-chevron-up"></i></div>
                                         <div id="quantity_dec_button" class="quantity_dec quantity_control"><i class="fas fa-chevron-down"></i></div>
                                     </div> #}
                                 </div>
                             </div>
-                            <div class="col-xs-6"> <button type="button" class="btn btn-success shop-button">Add to Cart</button> {# <button type="button" class="btn btn-success shop-button">Buy Now</button> #}
+                            <div class="col-xs-6"> <a href="{{ path('carrito_add', {'id':producto.id}) }}" class="add-to-cart"><button type="button" class="btn btn-success shop-button btnAjax">Add to Cart</button></a> {# <button type="button" class="btn btn-success shop-button">Buy Now</button> #}
+                            <div id="path-ajax" data-path="{{path('ajax_request')}}"></div>
                                {#  <div class="product_fav"><i class="fas fa-heart"></i></div> #}
                             </div>
                         </div>
@@ -119,7 +120,7 @@
                                 <div class="bbb_combo_image"><img class="bbb_combo_image" src="{{ asset('uploads/imagenesProd/' ~ productoRandom.imagen) }}" alt="{{productoRandom.nombre}}" title="{{productoRandom.nombre}}"></div>
                                 <div class="d-flex flex-row justify-content-start"> <strike style="color:red;"> <span class="fs-10" style="color:black;">{{ productoRandom.precio + random(20) }} €<span> </span></span></strike> <span class="ml-auto"><i class="fa fa-star p-rating"></i><i class="fa fa-star p-rating"></i><i class="fa fa-star p-rating"></i><i class="fa fa-star p-rating"></i></span> </div>
                                 <div class="d-flex flex-row justify-content-start" style=" margin-bottom: 13px; "> <span style="margin-top: -4px;">{{ productoRandom.precio }} €</span> <span class="ml-auto fs-10">0 Reviews</span> </div> <div class="descrip-prod">{{ productoRandom.descripcion }}</div>
-                                <div class="add-both-cart-button mt-4 mb-4"> <button type="button" class="btn btn-primary shop-button">Add to Cart</button> </div>
+                                <div class="add-both-cart-button mt-4 mb-4"><a href="{{ path('carrito_add', {'id':productoRandom.id}) }}"><button type="button" class="btn btn-primary shop-button">Add to Cart</button></a></div>
                             </div>
                         </div>
                     {% endfor %}
@@ -146,7 +147,7 @@
                                 <div class="bbb_combo_image"><img class="bbb_combo_image" src="{{ asset('uploads/imagenesProd/' ~ productoRandom.imagen) }}" alt="{{productoRandom.nombre}}" title="{{productoRandom.nombre}}"></div>
                                 <div class="d-flex flex-row justify-content-start"> <strike style="color:red;"> <span class="fs-10" style="color:black;">{{ productoRandom.precio + random(20) }} €<span> </span></span></strike> <span class="ml-auto"><i class="fa fa-star p-rating"></i><i class="fa fa-star p-rating"></i><i class="fa fa-star p-rating"></i><i class="fa fa-star p-rating"></i></span> </div>
                                 <div class="d-flex flex-row justify-content-start" style=" margin-bottom: 13px; "> <span style="margin-top: -4px;">{{ productoRandom.precio }} €</span> <span class="ml-auto fs-10">0 Reviews</span> </div> <div class="descrip-prod">{{ productoRandom.descripcion }}</div>
-                                <div class="add-both-cart-button mt-4 mb-4"> <button type="button" class="btn btn-primary shop-button">Add to Cart</button> </div>
+                                <div class="add-both-cart-button mt-4 mb-4"><a href="{{ path('carrito_add', {'id':productoRandom.id}) }}"><button type="button" class="btn btn-primary shop-button">Add to Cart</button></a></div>
                             </div>
                         </div>
                     {% endfor %}
@@ -297,4 +298,8 @@
            
 
 
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('resources/js/main.js') }}"></script>
 {% endblock %}

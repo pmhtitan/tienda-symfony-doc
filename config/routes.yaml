@@ -3,7 +3,7 @@
 #    controller: App\Controller\DefaultController::index
 
 productos:
-    path: /productos
+    path: /
     controller: App\Controller\ProductoController::index
 
 landing:
@@ -54,6 +54,43 @@ producto_eliminar:
     path: /producto-eliminar/{id}
     controller: App\Controller\ProductoController::delete
 
+#carrito
+carrito_index:
+    path: /carrito
+    controller: App\Controller\CarritoController::index
+
+carrito_add:
+    path: /carrito-add/{id}
+    controller: App\Controller\CarritoController::addItem
+    methods: GET|HEAD #[GET,POST]  
+
+carrito_remove:
+    path: /carrito-remove/{index}
+    controller: App\Controller\CarritoController::removeItem
+    methods: GET|HEAD
+
+ajax_request:
+    path: /ajax_request
+    controller: App\Controller\CarritoController::guardar_quantity_session
+
+carrito_up:
+    path: /carrito-up/{index}
+    controller: App\Controller\CarritoController::upItem
+    methods: GET|HEAD
+
+carrito_down:
+    path: /carrito-down/{index}
+    controller: App\Controller\CarritoController::downItem
+    methods: GET|HEAD
+
+carrito_delete:
+    path: /carrito-delete
+    controller: App\Controller\CarritoController::delete_all
+
+#checkout
+checkout_sesion:
+    path: /checkout-sesion
+    controller: App\Controller\CarritoController::checkout_session
 
 
 

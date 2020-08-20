@@ -153,9 +153,9 @@ header{
 
 section{
     position: relative;
-    height: calc(100vh - 3rem);
+/*     height: calc(100vh - 3rem); */
     width: 100%;
-    background: url('bg.jpg') no-repeat top center / cover;
+  /*   background: url('bg.jpg') no-repeat top center / cover; */
     overflow: hidden;
 }
 
@@ -589,4 +589,13 @@ section{
     .containerNavbar ul li{
         padding: 0px;
     }
+}
+
+.infoCompra{
+    -webkit-box-shadow: 0px 1px 6px -1px rgba(104,106,252,0.76);
+    -moz-box-shadow: 0px 1px 6px -1px rgba(104,106,252,0.76);
+    box-shadow: 0px 1px 6px -1px rgba(104,106,252,0.76);
+}
+.span-infoCompra-box{
+    max-width: 70%;
 }

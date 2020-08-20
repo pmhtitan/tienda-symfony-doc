@@ -18,7 +18,7 @@ class LineasPedidos
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="lineasPedidos")
+     * @ORM\ManyToOne(targetEntity=Pedido::class, inversedBy="lineasPedidos")
      */
     private $pedido;
 
@@ -47,12 +47,12 @@ class LineasPedidos
         return $this->id;
     }
 
-    public function getPedido(): ?User
+    public function getPedido(): ?Pedido
     {
         return $this->pedido;
     }
 
-    public function setPedido(?User $pedido): self
+    public function setPedido(?Pedido $pedido): self
     {
         $this->pedido = $pedido;
 

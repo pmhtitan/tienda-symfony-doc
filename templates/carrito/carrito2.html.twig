@@ -1,0 +1,101 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Shopping Cart{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('resources/css/carrito2.css') }}" type="text/css" rel="stylesheet" />
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+{% endblock %}
+
+{% block body %}
+
+<section class="jumbotron text-center shopping-cart-text">
+    <div class="container">
+        <h1 class="jumbotron-heading">SHOPPING CART</h1>
+     </div>
+</section>
+
+ {% set carrito = app.session.get('carrito') %}
+
+<div class="container mb-4">
+    <div class="row">
+
+    {% if carrito is defined %}
+        {% if carrito|length >= 1 %}
+
+        <div class="col-12">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col"> </th>
+                            <th scope="col">Product</th>
+                            <th scope="col">Available</th>
+                            <th scope="col" class="text-center">Quantity</th>
+                            <th scope="col" class="text-right">Price</th>
+                            <th> </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                     {% for indice,elemento in carrito %}
+                        {% set producto = elemento['producto'] %}
+                        <tr>
+                            {% if producto.imagen is null %} 
+                            <td><img src="{{ asset('uploads/imagenesProd/not-found.png') }}" height='50' width='50' /> </td>
+                            {% else %} 
+                            <td><img src="{{ asset('uploads/imagenesProd/' ~ producto.imagen) }}" height='50' width='50' /> </td>
+                            {% endif %}
+                            <td><a href="{{ path('mostrarProducto', {'id' : producto.id }) }}">{{ producto.nombre }}</a></td>
+                            <td>In stock</td>
+                            <td class="text-center"><a href="{{ path('carrito_down', {'index' : indice} ) }}"><i class="fa fa-minus btn btn-danger cantidad-icono icono-menos" aria-hidden="true"></i></a>{{ elemento['unidades'] }}<a href="{{ path('carrito_up', {'index' : indice} ) }}"><i class="fa fa-plus btn btn-success cantidad-icono icono-mas" aria-hidden="true"></i></a></td>
+                            <td class="text-right">{{ producto.precio }} €</td>
+                            <td class="text-right"><a href="{{ path('carrito_remove', {'index' : indice}) }}"><button class="btn btn-sm btn-danger"><i class="fa fa-trash"></i> </button></a></td>
+                        </tr>
+                     {% endfor %}   
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>Sub-Total</td>
+                            <td class="text-right">{{ stats.subtotal }} €</td>
+                        </tr>
+                        <tr>
+                            <td>Total de productos: {{ stats.items }}</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>Shipping</td>
+                            <td class="text-right">{{ stats.shippingPrice }} €</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td><strong>Total</strong></td>
+                            <td class="text-right"><strong>{{ stats.total }} €</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col mb-2">
+            <div class="row">
+                <div class="col-sm-12  col-md-6">
+                    <button class="btn btn-block btn-light">Continue Shopping</button>
+                </div>
+                <div class="col-sm-12 col-md-6 text-right">
+                    <a href="{{ path('checkout_sesion') }}" class="btn btn-lg btn-block btn-success text-uppercase">Checkout</a>
+                </div>
+            </div>
+        </div>
+          {% else %}
+            <p>Tu carrito está vacío</p>
+        {% endif %}
+       
+    {% endif %}
+    </div>
+</div>
+
+{% endblock %}

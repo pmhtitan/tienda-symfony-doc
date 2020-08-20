@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello CarritoController!{% endblock %}
+
+{% block body %}
+
+<div class="container">
+    
+    <h1>Carrito de la compra</h1>
+
+    {% set carrito = app.session.get('carrito') %}
+
+    {% if carrito is defined %}
+        {% if carrito|length >= 1 %}
+    <table>
+        <tr>
+            <th>Imagen</th>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th>Unidades</th>
+            <th>Eliminar</th>
+        </tr>
+        
+        {% for indice,elemento in carrito %}
+            {% set producto = elemento['producto'] %}
+        
+                <tr>
+                    <td>
+                        {% if producto.imagen is not null %} 
+                            <img src="<?php echo base_url?>uploads/images/<?php echo $producto->imagen;?>" class="img_carrito"/></td>
+                        {% else %}
+                            <img src="<?php echo base_url?>assets/img/camiseta.png" class="img_carrito"/></td>
+                        {% endif %}
+                    </td>
+                    <td><a href="<?php echo base_url?>producto/ver&id=<?php echo $producto->id;?>">{{ producto.nombre }} </a></td>
+                    <td>{{ producto.precio }} €</td>
+                    <td>
+                        {{ elemento['unidades'] }}
+                        <div class="updown-unidades">
+                            <a href="<?php echo base_url;?>carrito/upItem&index=<?php echo $indice?>" class="button">+</a>
+                            <a href="<?php echo base_url;?>carrito/downItem&index=<?php echo $indice?>" class="button">-</a>
+                        </div>
+                    </td>
+                    <td>
+                        <a href="<?php echo base_url;?>carrito/removeItem&index=<?php echo $indice;?>" class="button button-carrito button-red">Quitar producto</a>
+                    </td>
+                </tr>
+                
+        {% endfor %}       
+    </table>
+    <br/>
+    <div class="delete-carrito">
+        <a href="<?php echo base_url; ?>carrito/delete_all" class="button button-delete button-red">Vaciar carrito</a>
+    </div>
+    <div class="total-carrito">
+       
+        <h3> Precio total: €</h3>
+        <a href="<?php echo base_url;?>pedido/hacer" class="button button-pedido">Hacer pedido</a>
+    </div>
+    
+        {% else %}
+            <p>Tu carrito está vacío</p>
+        {% endif %}
+       
+    {% endif %}
+</div>
+{% endblock %}

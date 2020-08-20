@@ -23,18 +23,18 @@ class User implements UserInterface
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=180, unique=true)
+     * @ORM\Column(type="string", length=180, unique=true,  nullable=true)
      */
     private $email;
 
     /**
-     * @ORM\Column(type="json")
+     * @ORM\Column(type="json",  nullable=true)
      */
     private $roles = [];
 
     /**
      * @var string The hashed password
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string",  nullable=true)
      */
     private $password;
 
@@ -69,18 +69,20 @@ class User implements UserInterface
     private $datosFacturacions;
 
     /**
-     * @ORM\OneToMany(targetEntity=LineasPedidos::class, mappedBy="pedido")
+     * @ORM\Column(type="boolean")
      */
-    private $lineasPedidos;
+    private $sessionUser;
+
+    /* commented ---><
+      @ORM\OneToMany(targetEntity=LineasPedidos::class, mappedBy="pedido")
+     */
+    // private $lineasPedidos;
 
     
     public function __construct()
     {
-        $this->pedido = new ArrayCollection();
-        $this->datosFacturacion = new ArrayCollection();
         $this->pedidos = new ArrayCollection();
         $this->datosFacturacions = new ArrayCollection();
-        $this->lineasPedidos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -271,33 +273,38 @@ class User implements UserInterface
         return $this;
     }
 
-    /**
-     * @return Collection|LineasPedidos[]
-     */
-    public function getLineasPedidos(): Collection
-    {
-        return $this->lineasPedidos;
+
+    public function statsCarrito($carrito, float $shippingPrice){
+        $stats = array(
+            'products' => 0,
+            'items' => 0,
+            'subtotal' => 0,
+            'shippingPrice' => 0,
+            'total' => 0,
+        );
+
+        if(isset($carrito)){
+            $stats['products'] = count($carrito);
+
+            foreach($carrito as $producto){
+                $stats['subtotal'] += $producto['precio'] * $producto['unidades'];
+                $stats['items'] += $producto['unidades'];
+            } 
+        }
+        $stats['total'] = $stats['subtotal'] + $shippingPrice;
+        $stats['shippingPrice'] = $shippingPrice;
+
+        return $stats;
     }
 
-    public function addLineasPedido(LineasPedidos $lineasPedido): self
+    public function getSessionUser(): ?bool
     {
-        if (!$this->lineasPedidos->contains($lineasPedido)) {
-            $this->lineasPedidos[] = $lineasPedido;
-            $lineasPedido->setPedido($this);
-        }
-
-        return $this;
+        return $this->sessionUser;
     }
 
-    public function removeLineasPedido(LineasPedidos $lineasPedido): self
+    public function setSessionUser(bool $sessionUser): self
     {
-        if ($this->lineasPedidos->contains($lineasPedido)) {
-            $this->lineasPedidos->removeElement($lineasPedido);
-            // set the owning side to null (unless already changed)
-            if ($lineasPedido->getPedido() === $this) {
-                $lineasPedido->setPedido(null);
-            }
-        }
+        $this->sessionUser = $sessionUser;
 
         return $this;
     }
