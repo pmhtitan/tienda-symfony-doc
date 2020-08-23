@@ -210,7 +210,7 @@ class CarritoController extends AbstractController
        die();
     }
 
-    
+    //  AJAX REQUEST que lleva la Quantity del item por POST
    public function guardar_quantity_session(Request $request){
 
     if (!$request->isXmlHttpRequest()) {
@@ -231,54 +231,64 @@ class CarritoController extends AbstractController
 
     public function addItem($id){
 
+        /* $user=$tokenStorage->getToken()->getUser(); */
+        $logeado = $this->getUser();
+
+        (int) $quantity = $this->session->get('quantity'); // quantity de los items antes de llegar aqui
         
-        (int) $quantity = $this->session->get('quantity');  
+        if($logeado){
 
-        $carrito = $this->session->get('carrito');
+            //  Crear entidades Carrito y LineasCarrito --
 
-        if($carrito){
-            $counter = 0;
-            foreach($carrito as $indice => $elemento){
-                if($elemento['id_producto'] == $id){
-                    for($i = 1; $i <= $quantity; $i++){
-                        $carrito[$indice]['unidades']++;
-                    }                    
-                    $counter++;
+        }else{      
+
+            $carrito = $this->session->get('carrito');
+
+            if($carrito){
+                $counter = 0;
+                foreach($carrito as $indice => $elemento){
+                    if($elemento['id_producto'] == $id){
+                        for($i = 1; $i <= $quantity; $i++){
+                            $carrito[$indice]['unidades']++;
+                        }                    
+                        $counter++;
+                    }
                 }
             }
-        }
 
-        /* if(isset($_SESSION['carrito'])){
-            $counter = 0;
-            foreach($_SESSION['carrito'] as $indice => $elemento){
-                if($elemento['id_producto'] == $id){
-                    $_SESSION['carrito'][$indice]['unidades']++;
-                    $counter++;
+            /* if(isset($_SESSION['carrito'])){
+                $counter = 0;
+                foreach($_SESSION['carrito'] as $indice => $elemento){
+                    if($elemento['id_producto'] == $id){
+                        $_SESSION['carrito'][$indice]['unidades']++;
+                        $counter++;
+                    }
+                }
+            } */
+
+            if(!isset($counter) || $counter == 0){
+
+                //  Conseguir producto
+                $entityManager = $this->getDoctrine()->getManager();
+                $productoSeleccionado = $entityManager->getRepository(Producto::class)->find($id);
+
+                $carrito = $this->session->get('carrito');
+                if(empty($quantity)){
+                    $quantity = 1;
+                }
+                if($productoSeleccionado){
+                    $carrito[] =array(
+                        "id_producto" => $productoSeleccionado->getId(),
+                        "precio" => $productoSeleccionado->getPrecio(),
+                        "unidades" => $quantity,
+                        "producto" => $productoSeleccionado
+                    );
                 }
             }
-        } */
 
-        if(!isset($counter) || $counter == 0){
+            $this->session->set('carrito', $carrito);
 
-             //  Conseguir producto
-             $entityManager = $this->getDoctrine()->getManager();
-             $productoSeleccionado = $entityManager->getRepository(Producto::class)->find($id);
-
-             $carrito = $this->session->get('carrito');
-             if(empty($quantity)){
-                 $quantity = 1;
-             }
-             if($productoSeleccionado){
-                $carrito[] =array(
-                    "id_producto" => $productoSeleccionado->getId(),
-                    "precio" => $productoSeleccionado->getPrecio(),
-                    "unidades" => $quantity,
-                    "producto" => $productoSeleccionado
-                );
-             }
         }
-
-        $this->session->set('carrito', $carrito);
 
         return $this->redirectToRoute('carrito_index');
     }

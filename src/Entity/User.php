@@ -73,6 +73,11 @@ class User implements UserInterface
      */
     private $sessionUser;
 
+    /**
+     * @ORM\OneToOne(targetEntity=Carrito::class, mappedBy="usuario", cascade={"persist", "remove"})
+     */
+    private $carrito;
+
     /* commented ---><
       @ORM\OneToMany(targetEntity=LineasPedidos::class, mappedBy="pedido")
      */
@@ -305,6 +310,24 @@ class User implements UserInterface
     public function setSessionUser(bool $sessionUser): self
     {
         $this->sessionUser = $sessionUser;
+
+        return $this;
+    }
+
+    public function getCarrito(): ?Carrito
+    {
+        return $this->carrito;
+    }
+
+    public function setCarrito(?Carrito $carrito): self
+    {
+        $this->carrito = $carrito;
+
+        // set (or unset) the owning side of the relation if necessary
+        $newUsuario = null === $carrito ? null : $this;
+        if ($carrito->getUsuario() !== $newUsuario) {
+            $carrito->setUsuario($newUsuario);
+        }
 
         return $this;
     }

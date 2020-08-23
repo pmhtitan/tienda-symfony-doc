@@ -65,9 +65,15 @@ class Producto
      */
     private $lineasPedidos;
 
+    /**
+     * @ORM\OneToMany(targetEntity=LineasCarrito::class, mappedBy="producto")
+     */
+    private $lineasCarritos;
+
     public function __construct()
     {
         $this->lineasPedidos = new ArrayCollection();
+        $this->lineasCarritos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -196,6 +202,37 @@ class Producto
             // set the owning side to null (unless already changed)
             if ($lineasPedido->getProducto() === $this) {
                 $lineasPedido->setProducto(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|LineasCarrito[]
+     */
+    public function getLineasCarritos(): Collection
+    {
+        return $this->lineasCarritos;
+    }
+
+    public function addLineasCarrito(LineasCarrito $lineasCarrito): self
+    {
+        if (!$this->lineasCarritos->contains($lineasCarrito)) {
+            $this->lineasCarritos[] = $lineasCarrito;
+            $lineasCarrito->setProducto($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLineasCarrito(LineasCarrito $lineasCarrito): self
+    {
+        if ($this->lineasCarritos->contains($lineasCarrito)) {
+            $this->lineasCarritos->removeElement($lineasCarrito);
+            // set the owning side to null (unless already changed)
+            if ($lineasCarrito->getProducto() === $this) {
+                $lineasCarrito->setProducto(null);
             }
         }
 
