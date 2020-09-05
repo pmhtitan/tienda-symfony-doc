@@ -11,6 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Knp\Component\Pager\PaginatorInterface;
 
 class ProductoController extends AbstractController
 {
@@ -94,17 +95,27 @@ class ProductoController extends AbstractController
         ]);
     }
 
-    public function mostrarProdByCat($categoria){
+    public function mostrarProdByCat($categoria, PaginatorInterface $paginator, Request $request){
 
         $entityManager = $this->getDoctrine()->getManager();
 
         $categoria_repo = $entityManager->getRepository(Categoria::class)->findOneBy(['nombre' => $categoria]);
         $categoria_id = $categoria_repo->getId();
 
-        $prod_cat_repo = $entityManager->getRepository(Producto::class)->findBy(['categoria' => $categoria_id]);
+        //$prod_cat_repo = $entityManager->getRepository(Producto::class)->findBy(['categoria' => $categoria_id]);
+
+        $dql = "SELECT prod FROM App\Entity\Producto prod WHERE prod.categoria = $categoria_id";  
+        $query = $entityManager->createQuery($dql);
+
+        $pagination = $paginator->paginate(
+            $query, /* query NOT result */
+            $request->query->getInt('page', 1), /*page number*/
+            9 /*limit per page*/
+        );
+
 
         return $this->render('categoria/mostrarProdByCat.html.twig', [
-            'productos' => $prod_cat_repo,
+            'pagination' => $pagination,
             'nombreCategoria' => $categoria
         ]);
     }

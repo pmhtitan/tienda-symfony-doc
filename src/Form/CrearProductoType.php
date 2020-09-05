@@ -8,6 +8,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -42,11 +43,17 @@ class CrearProductoType extends AbstractType
             ], array(
                 'label' => 'Descripcion'
             ))
-            ->add('precio', IntegerType::class, [
+            ->add('precio', NumberType::class, [
                 'constraints' => [
                     new NotBlank([
                         'message' => 'El precio no puede estar en blanco',
                     ]),
+                ],
+                'html5' => true,
+                'scale' => 2,
+                'attr' => [
+                    'step' => "0.01",
+
                 ],
             ], array(
                 'label' => 'Precio'
