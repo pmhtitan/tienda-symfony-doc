@@ -18,10 +18,10 @@ class DatosFacturacionController extends AbstractController
     }
     public function gestionDatos(Request $request, UserInterface $userInterface){
 
-       $id = $this->getUser()->getId();
+       $usuario_id = $this->getUser()->getId();
         
         $entityManager = $this->getDoctrine()->getManager();
-        $datos_facturacion = $entityManager->getRepository(DatosFacturacion::class)->find($id);
+        $datos_facturacion = $entityManager->getRepository(DatosFacturacion::class)->findOneBy(['usuario' => $usuario_id]);
 
         if(!$datos_facturacion){
             $datos_facturacion = new DatosFacturacion(); 

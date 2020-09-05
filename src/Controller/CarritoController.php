@@ -2,11 +2,13 @@
 
 namespace App\Controller;
 
+use App\Entity\Carrito;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Producto;
 use App\Entity\User;
 use App\Entity\DatosFacturacion;
+use App\Entity\LineasCarrito;
 use App\Entity\Pedido;
 use App\Entity\LineasPedidos;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -53,7 +55,39 @@ class CarritoController extends AbstractController
 
         $user = new User();
 
-        $carritoSesion = $this->session->get('carrito');
+        $logeado = $this->getUser();
+        if($logeado){
+            $entityManager = $this->getDoctrine()->getManager();
+            $usuario_repo = $entityManager->getRepository(User::class)->find($logeado->getId());
+            $cart = $usuario_repo->getCarrito();
+            if($cart){
+                $cartID = $cart->getId();
+                $findAllLineas = $entityManager->getRepository(LineasCarrito::class)->findBy(['carrito' => $cartID]); //VALEN AMBAS. lineasCart o FindAllProducts
+                // $lineasCart = $cart->getLineasCarritos(); Tambien vale. PERO. Lo tenemos más dificil para saber si está vacío.
+            }else{
+                $findAllLineas = null;
+            }
+            
+           
+            
+            if(!empty($findAllLineas)){
+
+                foreach($findAllLineas as $productObj){
+                    $carritoSesion[] =array(
+                        "id_producto" => $productObj->getId(),
+                        "precio" => $productObj->getPrecio(),
+                        "unidades" => $productObj->getUnidades(),
+                        "producto" => $productObj->getProducto(),
+                    );
+                }
+            }else{
+                $carritoSesion = array();
+            }
+           
+        }else{            
+            $carritoSesion = $this->session->get('carrito');           
+        }
+        
 
         $shippingPrice = "6.75";
 
@@ -82,24 +116,125 @@ class CarritoController extends AbstractController
 
     public function checkout_session(Request $request){
 
-        $carrito = $this->session->get('carrito');
+        $logeado = $this->getUser();
+
+        if($logeado){
+            $entityManager = $this->getDoctrine()->getManager();
+            $usuario_repo = $entityManager->getRepository(User::class)->find($logeado->getId());
+            $cart = $usuario_repo->getCarrito();
+            $cartID = $cart->getId();
+            $findAllLineas = $entityManager->getRepository(LineasCarrito::class)->findBy(['carrito' => $cartID]); 
+            
+            if(!empty($findAllLineas)){
+
+                foreach($findAllLineas as $productObj){
+                    $carrito[] =array(
+                        "id_producto" => $productObj->getProducto()->getId(),
+                        "precio" => $productObj->getPrecio(),
+                        "unidades" => $productObj->getUnidades(),
+                        "producto" => $productObj->getProducto(),
+                    );
+                }
+            }else{
+                return $this->redirectToRoute('carrito_index');
+            }
+           
+        }else{                      
+            $carrito = $this->session->get('carrito');
+        }
 
         $user = new User();
-        $carritoSesion = $this->session->get('carrito');
         $shippingPrice = "6.75";
-        $stats = $user->statsCarrito($carritoSesion, $shippingPrice);
+        $stats = $user->statsCarrito($carrito, $shippingPrice);
         
         
         $defaultData = ['message' => 'Type your message here'];
-        $form = $this->createForm(DatosFacturacionSesionType::class, $defaultData);
+
+        if($logeado){
+            $usuario_id = $logeado->getId();
+            $datosFacturacion_logeado = $this->getDoctrine()->getManager()->getRepository(DatosFacturacion::class)->findOneBy(['usuario' => $usuario_id]);
+
+            //  Si son true, significa que hay datos de facturación existentes, por lo que no tenemos que crear nada
+            if($datosFacturacion_logeado){
+                $form = $this->createForm(DatosFacturacionSesionType::class, $datosFacturacion_logeado);
+            }else{
+                $datosFact = new DatosFacturacion();
+                $form = $this->createForm(DatosFacturacionSesionType::class, $datosFact);
+            }
+        }else{
+            $form = $this->createForm(DatosFacturacionSesionType::class, $defaultData);
+        }
+       
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            $entityManager = $this->getDoctrine()->getManager();
+
+            if($logeado){
+                if($datosFacturacion_logeado){                
+                    //  Update
+                    $entityManager->persist($datosFacturacion_logeado); 
+                }else{
+                    //  Create 
+                    $datosFact->setUsuario($logeado);
+                    $entityManager->persist($datosFact);
+                }           
+                $entityManager->flush();
+                
+                 //  Pedido
+                 $pedido = new Pedido();
+                 $date = new \DateTime('now');
+                 $coste = $stats['total'];
+                 $pedido->setUsuario($logeado);
+                 $pedido->setCoste($coste);
+                 $pedido->setEstado("pendiente");                
+                 $pedido->setCreatedAt($date);
+                 $pedido->setUpdatedAt($date);
+                 $entityManager->persist($pedido);
+                 $entityManager->flush();
+
+                 $idPedido = $pedido->getId();
+                
+                 $objetoPedido = $entityManager->getRepository(Pedido::class)->find($idPedido);
+ 
+                 //  Lineas Pedidos
+                 foreach($carrito as $producto){
+                     $objetoProducto = $entityManager->getRepository(Producto::class)->find($producto['id_producto']);
+                     $lineaPedido = new LineasPedidos();
+                     $lineaPedido->setPedido($objetoPedido);
+                     $lineaPedido->setProducto($objetoProducto);
+                     $lineaPedido->setUnidades($producto['unidades']);
+                     $lineaPedido->setCreatedAt($date);
+                     $lineaPedido->setUpdatedAt($date);                   
+                     $entityManager->persist($lineaPedido);
+                     $entityManager->flush();
+                 }
+
+                 // Borrar carrito (borrar productos asociados al carrito y dejarlo vacío)
+
+                    $lineasCarrito_repo = $entityManager->getRepository(LineasCarrito::class)->findBy(['carrito' => $cartID]);
+                        foreach($lineasCarrito_repo as $linea){
+                            $entityManager->remove($linea);
+                        }                
+                    $entityManager->flush();
+
+                    //  Update - Subtotal del carrito a 0
+                    $query = $entityManager->createQuery(
+                        "UPDATE App\Entity\Carrito a SET a.subtotal = 0 WHERE a.id = '$cartID'"
+                       );
+                    $query->execute();
+
+                 return $this->render('pedido/datosCompra.html.twig',[
+                    'carrito' => $carrito,
+                    'stats' => $stats,
+                ]);
+
+            }else{
             
             $datos = $form->getData();
             $date = new \DateTime('now');
-            $entityManager = $this->getDoctrine()->getManager();
 
             $user->setName($datos['nombre']);
             $user->setCreatedAt($date);
@@ -170,7 +305,8 @@ class CarritoController extends AbstractController
                 return $this->render('pedido/datosCompra.html.twig',[
                     'carrito' => $carrito,
                     'stats' => $stats,
-                ]);            
+                ]); 
+            }           
             
         }
 
@@ -231,14 +367,87 @@ class CarritoController extends AbstractController
 
     public function addItem($id){
 
-        /* $user=$tokenStorage->getToken()->getUser(); */
         $logeado = $this->getUser();
 
         (int) $quantity = $this->session->get('quantity'); // quantity de los items antes de llegar aqui
+
+        if(empty($quantity)){
+            $quantity = 1;
+        }
+
         
         if($logeado){
 
-            //  Crear entidades Carrito y LineasCarrito --
+            $entityManager = $this->getDoctrine()->getManager();
+
+            $cart = $entityManager->getRepository(Carrito::class)->findOneBy(
+                ['usuario' => $logeado->getId()], null, 1);
+                
+            if(!empty($cart)){
+
+                // Comprobar si el producto seleccionado, está ya en el carrito.
+                $carrito_id = $cart->getId();
+                $linea_carrito_seleccionado = $entityManager->getRepository(LineasCarrito::class)->findOneBy(
+                     ['carrito' => $carrito_id, 'producto' => $id]
+                );
+
+                $banderaQuery_Prod = false;
+
+               if(empty($linea_carrito_seleccionado)){
+
+                $productoSeleccionado = $entityManager->getRepository(Producto::class)->find($id);
+                $linea_carrito = new LineasCarrito();
+                $linea_carrito->setCarrito($cart);
+                $linea_carrito->setProducto($productoSeleccionado);
+                $linea_carrito->setPrecio($productoSeleccionado->getPrecio());
+                $linea_carrito->setUnidades($quantity);
+                $entityManager->persist($linea_carrito);            
+                $entityManager->flush();
+                $banderaQuery_Prod = true;
+               }else{
+                   //   El producto ya estaba en la caja, aumentar unidades
+                   $query = $entityManager->createQuery(
+                    "UPDATE App\Entity\LineasCarrito a SET a.unidades = a.unidades + '$quantity' WHERE a.producto = '$id' AND a.carrito = '$carrito_id'"
+                   );
+                   $query->execute();
+               }
+                // Aumentar el subtotal
+                    if(!$banderaQuery_Prod){
+                        $productoSeleccionado = $entityManager->getRepository(Producto::class)->find($id);
+                    }
+                
+                    $precio_subtotal = $productoSeleccionado->getPrecio() * $quantity;
+
+                    $query = $entityManager->createQuery(
+                        "UPDATE App\Entity\Carrito a SET a.subtotal = a.subtotal + '$precio_subtotal' WHERE a.id = '$carrito_id'"
+                    );
+                    $query->execute();
+              
+
+            }else{        
+
+            $productoSeleccionado = $entityManager->getRepository(Producto::class)->find($id);
+            $subtotal = $productoSeleccionado->getPrecio() * $quantity;
+            $date = new \DateTime('now');
+            $cart = new Carrito();
+            $cart->setUsuario($logeado);
+            $cart->setSubtotal($subtotal);
+            $cart->setCreatedAt($date);
+            $cart->setUpdatedAt($date);
+            $entityManager->persist($cart);
+            $entityManager->flush();
+
+           
+            $linea_carrito = new LineasCarrito();
+            $linea_carrito->setCarrito($cart);
+            $linea_carrito->setProducto($productoSeleccionado);
+            $linea_carrito->setPrecio($productoSeleccionado->getPrecio());
+            $linea_carrito->setUnidades($quantity);
+            $entityManager->persist($linea_carrito);            
+            $entityManager->flush();
+
+            }
+            
 
         }else{      
 
@@ -294,39 +503,128 @@ class CarritoController extends AbstractController
     }
 
     public function removeItem($index){ 
+        //  En caso de carrito sesion, index = index,
+        //  En caso de carrito cuenta, index = idProductoSeleccionado
+
+        $logeado = $this->getUser();
+
+        if($logeado){
+
+            //  Quitar la lineaCarrito del producto seleccionado, cuyo carrito es el del usuario logeado
+            $entityManager = $this->getDoctrine()->getManager();
+
+            $cart = $entityManager->getRepository(Carrito::class)->findOneBy(
+                ['usuario' => $logeado->getId()], null, 1);
+            $carrito_id = $cart->getId();
+
+            $productoSeleccionado = $entityManager->getRepository(Producto::class)->find($index);
+            $producto_id = $productoSeleccionado->getId();
+            $linea_carrito = $entityManager->getRepository(LineasCarrito::class)->findOneBy(['carrito' => $carrito_id, 'producto' => $producto_id]);
+            $precio_producto = $productoSeleccionado->getPrecio();           
+            $quantity = $linea_carrito->getUnidades();
+            $precio_prod_por_unidades = $precio_producto * $quantity;
+
+            $entityManager->remove($linea_carrito);
+            $entityManager->flush();
+            
+            $query = $entityManager->createQuery(
+                "UPDATE App\Entity\Carrito a SET a.subtotal = a.subtotal - $precio_prod_por_unidades WHERE a.id = '$carrito_id'"
+               );
+            $query->execute();
+
+        }else{
            
-        $carrito = $this->session->get('carrito');
+            $carrito = $this->session->get('carrito');
 
-            //   Remover producto de la sesión carrito
-            unset($carrito[$index]);
+                //   Remover producto de la sesión carrito
+                unset($carrito[$index]);
 
-        $this->session->set('carrito', $carrito);
+            $this->session->set('carrito', $carrito);
+
+        }
 
         return $this->redirectToRoute('carrito_index');
     }
 
     public function upItem($index){
 
-        $carrito = $this->session->get('carrito');
+        $logeado = $this->getUser();
 
-          $carrito[$index]['unidades']++;
+        if($logeado){
 
-        $this->session->set('carrito', $carrito);
+            //  Subir una unidad en la linea del producto seleccionado
+            $entityManager = $this->getDoctrine()->getManager();
+
+            $cart = $entityManager->getRepository(Carrito::class)->findOneBy(
+                ['usuario' => $logeado->getId()], null, 1);
+            $carrito_id = $cart->getId();
+
+            $productoSeleccionado = $entityManager->getRepository(Producto::class)->find($index);
+            $precio_producto = $productoSeleccionado->getPrecio();
+
+            //  aumentar unidades
+            $query = $entityManager->createQuery(
+                "UPDATE App\Entity\LineasCarrito a SET a.unidades = a.unidades + 1 WHERE a.producto = '$index' AND a.carrito = '$carrito_id'"
+            );
+            //  aumentar el subtotal del carrito
+            $querySubtotal = $entityManager->createQuery(
+                "UPDATE App\Entity\Carrito a SET a.subtotal = a.subtotal + $precio_producto WHERE a.id = '$carrito_id'"
+               );
+            $query->execute();
+            $querySubtotal->execute();         
+
+        }else{
+
+            $carrito = $this->session->get('carrito');
+
+                $carrito[$index]['unidades']++;
+
+            $this->session->set('carrito', $carrito);
+        }
 
         return $this->redirectToRoute('carrito_index');
+        
     }
 
     public function downItem($index){
 
-        $carrito = $this->session->get('carrito');
+        $logeado = $this->getUser();
 
-            if($carrito[$index]['unidades'] == 1){
-                unset($carrito[$index]);
-            }else{
-                $carrito[$index]['unidades']--;
-            }
-        
-        $this->session->set('carrito', $carrito);
+        if($logeado){
+
+            //  Bajar una unidad en la linea del producto seleccionado
+            $entityManager = $this->getDoctrine()->getManager();
+
+            $cart = $entityManager->getRepository(Carrito::class)->findOneBy(
+                ['usuario' => $logeado->getId()], null, 1);
+            $carrito_id = $cart->getId();
+
+            $productoSeleccionado = $entityManager->getRepository(Producto::class)->find($index);
+            $precio_producto = $productoSeleccionado->getPrecio();
+            
+            //  bajar unidades
+            $query = $entityManager->createQuery(
+                "UPDATE App\Entity\LineasCarrito a SET a.unidades = a.unidades - 1 WHERE a.producto = '$index' AND a.carrito = '$carrito_id'"
+            );
+            //  bajar el subtotal del carrito
+            $querySubtotal = $entityManager->createQuery(
+                "UPDATE App\Entity\Carrito a SET a.subtotal = a.subtotal - $precio_producto WHERE a.id = '$carrito_id'"
+               );
+            $query->execute();
+            $querySubtotal->execute();           
+
+        }else{
+
+            $carrito = $this->session->get('carrito');
+
+                if($carrito[$index]['unidades'] == 1){
+                    unset($carrito[$index]);
+                }else{
+                    $carrito[$index]['unidades']--;
+                }
+            
+            $this->session->set('carrito', $carrito);
+        }
        
         return $this->redirectToRoute('carrito_index');
     }

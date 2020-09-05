@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Categoria;
 use App\Entity\Producto;
 use App\Form\CrearProductoType;
 use App\Form\EditarProductoType;
@@ -86,10 +87,25 @@ class ProductoController extends AbstractController
 
     public function mostrarProductos(){
 
-        $producto_repo = $this->getDoctrine()->getRepository(Producto::class)->findAll();
+        $producto_repo = $this->getDoctrine()->getRepository(Producto::class)->findBy([],[],9);
 
         return $this->render('producto/mostrarProductos.html.twig', [
-            'productos' => $producto_repo
+            'productos' => $producto_repo,
+        ]);
+    }
+
+    public function mostrarProdByCat($categoria){
+
+        $entityManager = $this->getDoctrine()->getManager();
+
+        $categoria_repo = $entityManager->getRepository(Categoria::class)->findOneBy(['nombre' => $categoria]);
+        $categoria_id = $categoria_repo->getId();
+
+        $prod_cat_repo = $entityManager->getRepository(Producto::class)->findBy(['categoria' => $categoria_id]);
+
+        return $this->render('categoria/mostrarProdByCat.html.twig', [
+            'productos' => $prod_cat_repo,
+            'nombreCategoria' => $categoria
         ]);
     }
 

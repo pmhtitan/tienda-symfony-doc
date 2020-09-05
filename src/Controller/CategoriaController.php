@@ -98,4 +98,13 @@ class CategoriaController extends AbstractController
 
         return $this->redirectToRoute('gestionCategorias');
     }
+
+    public function getCategorias(){
+
+        $categorias_repo = $this->getDoctrine()->getManager()->getRepository(Categoria::class)->findAll();
+
+        return $this->render('categoria/getCategoriasNavbar.html.twig', [
+            'categorias' => $categorias_repo,
+        ]);
+    }
 }

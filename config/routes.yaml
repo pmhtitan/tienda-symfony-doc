@@ -92,5 +92,10 @@ checkout_sesion:
     path: /checkout-sesion
     controller: App\Controller\CarritoController::checkout_session
 
+#ProdByCat
+prod_categoria:
+    path: /categoria/{categoria}
+    controller: App\Controller\ProductoController::mostrarProdByCat
+
 
 

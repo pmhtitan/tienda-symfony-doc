@@ -278,30 +278,6 @@ class User implements UserInterface
         return $this;
     }
 
-
-    public function statsCarrito($carrito, float $shippingPrice){
-        $stats = array(
-            'products' => 0,
-            'items' => 0,
-            'subtotal' => 0,
-            'shippingPrice' => 0,
-            'total' => 0,
-        );
-
-        if(isset($carrito)){
-            $stats['products'] = count($carrito);
-
-            foreach($carrito as $producto){
-                $stats['subtotal'] += $producto['precio'] * $producto['unidades'];
-                $stats['items'] += $producto['unidades'];
-            } 
-        }
-        $stats['total'] = $stats['subtotal'] + $shippingPrice;
-        $stats['shippingPrice'] = $shippingPrice;
-
-        return $stats;
-    }
-
     public function getSessionUser(): ?bool
     {
         return $this->sessionUser;
@@ -330,6 +306,29 @@ class User implements UserInterface
         }
 
         return $this;
+    }
+
+    public function statsCarrito($carrito, float $shippingPrice){
+        $stats = array(
+            'products' => 0,
+            'items' => 0,
+            'subtotal' => 0,
+            'shippingPrice' => 0,
+            'total' => 0,
+        );
+
+        if(isset($carrito)){
+            $stats['products'] = count($carrito);
+
+            foreach($carrito as $producto){
+                $stats['subtotal'] += $producto['precio'] * $producto['unidades'];
+                $stats['items'] += $producto['unidades'];
+            } 
+        }
+        $stats['total'] = $stats['subtotal'] + $shippingPrice;
+        $stats['shippingPrice'] = $shippingPrice;
+
+        return $stats;
     }
 
    

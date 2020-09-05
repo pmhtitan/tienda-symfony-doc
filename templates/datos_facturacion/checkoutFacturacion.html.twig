@@ -14,7 +14,7 @@
         {% endfor %}
         <h3>Productos a comprar</h3>
 
-        {% set carrito = app.session.get('carrito') %}
+        {# {% set carrito = app.session.get('carrito') %} #}
 
         {% if carrito is defined %}
             {% if carrito|length >= 1 %}
