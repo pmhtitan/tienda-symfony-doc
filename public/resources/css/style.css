@@ -718,3 +718,22 @@ section{
     }
 
 /* /--/ */
+
+/* Mario fix FrontEnd boxes productos destacados. */
+
+.card > a{
+    height: 244px;
+    display: block;
+}
+.card-img-top{
+    width: auto;
+    height: 100%;
+}
+.card-title{
+    margin-bottom: .75rem;
+    min-height: 48px;
+}
+p.card-text{
+    min-height: 48px;
+}
+
